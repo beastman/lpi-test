@@ -1,0 +1,23 @@
+.plupload_wrapper {
+    margin-left: 150px;
+}
+.plupload_images {
+    display: block;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+.plupload_images li {
+    display: inline-block;
+    padding: 10px;
+    cursor: move;
+}
+.plupload_images li a {
+    font-size: 16px;
+    font-weight: bold;
+}
+.plupload_uploader {
+    font-size: 18px;
+}
+.plupload_pickedfiles {
+    font-size: 16px;
+}

@@ -1,0 +1,6 @@
+/venv/
+/db.sqlite3
+*.pyc
+/.idea/
+/media/*
+lpi_studio_test.iml

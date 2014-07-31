@@ -1,0 +1,36 @@
+{% load rur_price %}<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <style type="text/css">
+        /* Решение от artlebedev.ru */
+        @font-face { font-family: "Rubl Sign"; src: url(http://www.artlebedev.ru/;-)/ruble.eot); }
+        span.rur { font-family: "Rubl Sign"; text-transform: uppercase; // text-transform: none;}
+        span.rur span { position: absolute; overflow: hidden; width: .45em; height: 1em; margin: .1ex 0 0 -.55em; // display: none; }
+        span.rur span:before { content: '\2013'; }
+
+    </style>
+</head>
+<body>
+    <h2>Фильтр</h2>
+    <form action="" method="post">
+        {% csrf_token %}
+        {{ filter_form.as_p }}
+        <p>
+            <input type="submit" value="Отфильтровать" />
+        </p>
+    </form>
+    <h2>Товары</h2>
+    <ul>
+        {% for product in products %}
+            <li>
+            <a href="{{ product.get_absolute_url }}">{{ product.title }}</a>
+            {{ product.price|rur_sign }}
+            </li>
+        {% empty %}
+            <li>Товаров, удовлетворяющих заданным критериям, не найдено</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

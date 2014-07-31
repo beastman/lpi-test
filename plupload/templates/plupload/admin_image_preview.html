@@ -1,0 +1,10 @@
+{% load thumbnail %}
+{% thumbnail image.image '215x215' crop='center' as im %}
+    <li class="uploaded_image"><div>
+        <input type="hidden" name="{{ field_name }}" value="{{ image.pk }}" />
+        <div class="image"><img src="{{ im.url }}" alt="" /></div>
+        <a href="#" class="delete">Удалить</a>
+        <input type="hidden" class="weight-input" name="weight-{{ image.pk }}" value="{{ image.sort_order }}" />
+    </div>
+    </li>
+{% endthumbnail %}

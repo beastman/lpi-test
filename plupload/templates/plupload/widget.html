@@ -1,0 +1,98 @@
+<div class="plupload_wrapper" id="{{ id }}_wrapper">
+    <ul class="plupload_images" id="{{ id }}_images">
+        {% if images %}
+            {% for image in images %}
+                {% include "plupload/admin_image_preview.html" with image=image field_name=name %}
+            {% endfor %}
+        {% endif %}
+    </ul>
+    <div class="plupload_pickedfiles" id="{{ id }}_pickedfiles"></div>
+    <div class="plupload_uploader" id="{{ id }}_uploader">
+        <a href="#" class="pick_files"id="{{ id }}_pickfiles">Выбрать файлы</a>
+        |
+        <a href="#" class="start_upload" id="{{ id }}_uploadfiles">Начать загрузку</a>
+    </div>
+</div>
+<script type="text/javascript">
+    // Custom example logic
+    jQuery(function() {
+        function updateWeights() {
+            jQuery('.plupload_images li').each(function(i) {
+                jQuery('input.weight-input',jQuery(this)).val(i);
+            });
+        }
+        jQuery('.plupload_images').sortable({
+            stop: updateWeights
+        });
+        var uploader = new plupload.Uploader({
+            runtimes : 'html5,flash',
+            browse_button : '{{ id }}_pickfiles',
+            container : '{{ id }}_wrapper',
+            max_file_size : '10mb',
+            url : '{% url 'plupload_upload_handler' %}',
+            flash_swf_url : '{{ STATIC_URL }}/plupload/js/plupload.flash.swf',
+            filters : [
+                {title : "Картинки", extensions : "jpg,gif,png"},
+            ]
+        });
+
+        uploader.bind('Init', function(up, params) {
+            jQuery('#{{ id }}_pickedfiles').html("<div>Текущий рантайм: " + params.runtime + "</div>");
+        });
+
+        jQuery('#{{ id }}_uploadfiles').click(function(e) {
+            uploader.start();
+            e.preventDefault();
+        });
+
+        uploader.init();
+
+        uploader.bind('FilesAdded', function(up, files) {
+            $.each(files, function(i, file) {
+                jQuery('#{{ id }}_pickedfiles').append(
+                        '<div id="' + file.id + '">' +
+                                file.name + ' (' + plupload.formatSize(file.size) + ') <b></b>' +
+                                '</div>');
+            });
+
+            up.refresh(); // Reposition Flash/Silverlight
+        });
+
+        uploader.bind('UploadProgress', function(up, file) {
+            jQuery('#' + file.id + " b").html(file.percent + "%");
+        });
+
+        uploader.bind('Error', function(up, err) {
+            jQuery('#{{ id }}_pickedfiles').append("<div>Ошибка: " + err.code +
+                    ", Сообщение: " + err.message +
+                    (err.file ? ", Файл: " + err.file.name : "") +
+                    "</div>"
+            );
+
+            up.refresh(); // Reposition Flash/Silverlight
+        });
+        uploader.bind('FileUploaded', function(up, file, response) {
+            file_id = parseInt(response.response);
+            if(file_id) {
+                $.get('{% url 'plupload_admin_image_preview' %}?field_name={{ name }}&image_id='+file_id, {}, function(data) {
+                    jQuery('#{{ id }}_images').append(data);
+                    updateWeights();
+                }, 'html');
+            }
+
+            jQuery('#' + file.id + " b").html("100%");
+        });
+
+
+
+        uploader.bind('FileUploaded', function(up, file) {
+            jQuery('#' + file.id + " b").html("100%");
+        });
+        jQuery('.plupload_images').on('click', '.delete', function() {
+            if(confirm('Вы уверены?')) {
+                jQuery(this).parents('li:first').detach();
+            }
+            return false;
+        });
+    });
+</script>
